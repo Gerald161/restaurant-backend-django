@@ -1,7 +1,6 @@
 from django.http import JsonResponse, HttpResponse
 from .models import Food, Added_Image
 import re
-from rest_framework.parsers import JSONParser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -14,8 +13,16 @@ class Upload(APIView):
         
         food.price = request.data.get("price")
         
-        food.slug = re.sub(r'\s', "-", request.POST.get('name').lower())
+        food.category = request.data.get("category")
         
+        food.save()
+        
+        slug = re.sub(r'\s', "-", request.POST.get('name').lower())
+        
+        food.slug = slug
+        
+        food.slug = f"{food.slug}-{food.id}"
+
         food.save()
         
         for image in request.FILES.values():
@@ -30,3 +37,53 @@ class Upload(APIView):
         return Response({
             'status': 'complete'
         })
+        
+
+class Remove(APIView):
+    def delete(self, request, *args, **kwargs):
+        slug = self.kwargs['slug']
+        
+        try:
+            food = Food.objects.filter(slug=slug).first()
+            
+            # if food is not None alternatively
+            
+            food.delete()
+            
+            return Response({
+                'status': 'deleted'
+            })
+        except:
+            return Response({
+                'status': 'not found'
+            })
+            
+
+class Search(APIView):
+    def get(self, request, *args, **kwargs):
+        slug = self.kwargs['slug']
+        
+        if request.POST.get('search') is not None:
+            search_term = request.POST.get('search').lower()
+        else:
+            search_term = slug.replace("-", " ")
+        
+        all_foods = Food.objects.filter(name__istartswith=search_term)
+        
+        food_json_container = []
+        
+        all_images_container = []
+        
+        for food in all_foods:
+            for image in food.images.all():
+                all_images_container.append(str(image))
+            
+            food_json_container.append({
+                "name": food.name,
+                "slug": food.slug,
+                "price": food.price,
+                "category": food.category,
+                "images": all_images_container
+            })
+        
+        return Response(food_json_container)

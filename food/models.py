@@ -11,6 +11,11 @@ class Added_Image(models.Model):
     def __str__(self):
         return self.image.name
     
+    def delete(self, *args, **kwargs):
+        self.image.delete()
+        
+        super().delete(*args, **kwargs)
+    
     def save(self, *args, **kwargs):
         if self.image:
             if self.image.size > 35000:
@@ -54,15 +59,22 @@ class Added_Image(models.Model):
         super().save(*args, **kwargs)
 
 class Food(models.Model):
+    MEAL_CHOICES = [
+        ("breakfast", "Breakfast"), ("lunch", "Lunch"), ("supper", "Supper")
+    ]
+    
     name = models.CharField(max_length=300)
     slug = models.SlugField(null=True)
     images = models.ManyToManyField(Added_Image)
     price = models.CharField(max_length=6, default=1)
+    category = models.CharField(default="breakfast", choices=MEAL_CHOICES, max_length=20)
 
     def __str__(self):
         return str(self.slug)
 
     def delete(self, *args, **kwargs):
-        # self.image.delete()
+        # Delete associated images before deleting the Food model
+        for image in self.images.all():
+            image.delete()
         
         super().delete(*args, **kwargs)
