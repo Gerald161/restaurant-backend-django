@@ -32,7 +32,27 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    # Add more origins as needed
+]
+
+# Allow specific headers and methods
+CORS_ALLOW_HEADERS = [
+    "token",  # Add any custom headers you are using
+    "Content-Type",
+    "Accept",
+]
+
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "PUT",
+    "DELETE",
+]
+
 
 # Application definition
 
@@ -160,3 +180,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024

@@ -25,6 +25,8 @@ class Upload(APIView):
 
         food.save()
         
+        print(request.FILES)
+        
         for image in request.FILES.values():
             added_image = Added_Image()
             
@@ -63,12 +65,48 @@ class Search(APIView):
     def get(self, request, *args, **kwargs):
         slug = self.kwargs['slug']
         
+        food_json_container = []
+            
+        all_images_container = []
+        
         if request.POST.get('search') is not None:
             search_term = request.POST.get('search').lower()
+            
+            all_foods = Food.objects.filter(name__istartswith=search_term)[:8]
+            
+            for food in all_foods:    
+                food_json_container.append({
+                    "name": food.name,
+                })
+            
+            return Response(food_json_container)
         else:
             search_term = slug.replace("-", " ")
         
-        all_foods = Food.objects.filter(name__istartswith=search_term)
+            all_foods = Food.objects.filter(name__istartswith=search_term)[:8]
+            
+            for food in all_foods:
+                for image in food.images.all():
+                    all_images_container.append(str(image))
+                
+                food_json_container.append({
+                    "name": food.name,
+                    "slug": food.slug,
+                    "price": food.price,
+                    "category": food.category,
+                    "images": all_images_container
+                })
+            
+            return Response(food_json_container)
+    
+
+class Category(APIView):
+    def get(self, request, *args, **kwargs):
+        slug = self.kwargs['slug']
+        
+        category = slug.replace("-", " ")
+        
+        all_foods = Food.objects.filter(category__iexact=category)[:12]
         
         food_json_container = []
         
@@ -87,3 +125,33 @@ class Search(APIView):
             })
         
         return Response(food_json_container)
+    
+    
+class Edit_Dish(APIView):
+    def get(self, request, *args, **kwargs):
+        slug = self.kwargs['slug']
+        
+        try:
+            all_images_container = []
+            
+            food = Food.objects.filter(slug=slug).first()
+            
+            for image in food.images.all():
+                all_images_container.append(str(image))
+            
+            return Response({
+                "name": food.name,
+                "slug": food.slug,
+                "price": food.price,
+                "category": food.category,
+                "images": all_images_container
+            })
+        except:
+            return Response({
+                'status': 'not found'
+            })
+            
+    def post(self, request, *args, **kwargs):
+        return Response({
+            'status': 'final update save stuff'
+        })
