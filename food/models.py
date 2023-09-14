@@ -18,35 +18,38 @@ class Added_Image(models.Model):
     
     def save(self, *args, **kwargs):
         if self.image:
-            if self.image.size > 35000:
+            max_size_kb = 200  # Maximum size in KB
+
+            # Convert KB to bytes
+            max_size_bytes = max_size_kb * 1024
+            
+            if self.image.size > max_size_bytes:
                 im = Image.open(self.image)
         
                 width, height = im.size
         
                 output = BytesIO()
+                
+                # Calculate the resize factor based on the desired size thresholds
+                resize_factor = 1
         
-                if self.image.size >= 10000000:
-                    im = im.resize((width // 20, height // 20), Image.Resampling.LANCZOS)
-                elif self.image.size >= 5000000:
-                    im = im.resize((width // 10, height // 10), Image.Resampling.LANCZOS)
-                elif self.image.size >= 4000000:
-                    im = im.resize((width // 6, height // 6), Image.Resampling.LANCZOS)
-                elif self.image.size >= 2000000:
-                    im = im.resize((width // 4, height // 4), Image.Resampling.LANCZOS)
-                elif self.image.size >= 1000000:
-                    im = im.resize((width // 3, height // 3), Image.Resampling.LANCZOS)
-                elif self.image.size >= 800000:
-                    im = im.resize((width // 2, height // 2), Image.Resampling.LANCZOS)
-                elif self.image.size >= 500000:
-                    im = im.resize((width // 5, height // 5), Image.Resampling.LANCZOS)
-                elif self.image.size >= 300000:
-                    im = im.resize((width // 4, height // 4), Image.Resampling.LANCZOS)
-                elif self.image.size >= 150000:
-                    im = im.resize((width // 3, height // 3), Image.Resampling.LANCZOS)
-                elif self.image.size >= 100000:
-                    im = im.resize((width // 2, height // 2), Image.Resampling.LANCZOS)
-                else:
-                    im = im.resize((width // 2, height // 2), Image.Resampling.LANCZOS)
+                if self.image.size >= 10 * 1024 * 1024:  # 10 MB
+                    resize_factor = 1 / 10
+                elif self.image.size >= 5 * 1024 * 1024:  # 5 MB
+                    resize_factor = 1 / 7
+                elif self.image.size >= 4 * 1024 * 1024:  # 4 MB
+                    resize_factor = 1 / 6
+                elif self.image.size >= 2 * 1024 * 1024:  # 2 MB
+                    resize_factor = 1 / 4
+                elif self.image.size >= 1 * 1024 * 1024:  # 1 MB
+                    resize_factor = 1 / 3
+                else:# 800 KB and below
+                    resize_factor = 1 / 2
+                    
+                new_width = int(width * resize_factor)
+                new_height = int(height * resize_factor)
+
+                im = im.resize((new_width, new_height), Image.LANCZOS)
         
                 rgb_im = im.convert('RGB')
         
@@ -60,7 +63,7 @@ class Added_Image(models.Model):
 
 class Food(models.Model):
     MEAL_CHOICES = [
-        ("breakfast", "Breakfast"), ("lunch", "Lunch"), ("supper", "Supper")
+        ("breakfast", "Breakfast"), ("lunch", "Lunch"), ("supper", "Supper"), ("drinks", "Drinks")
     ]
     
     name = models.CharField(max_length=300)
