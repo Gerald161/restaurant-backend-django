@@ -108,24 +108,20 @@ class Category(APIView):
         
         food_json_container = []
         
-        all_images_container = []
-        
         for food in all_foods:
-            for image in food.images.all():
-                all_images_container.append(str(image))
+            image = str(food.images.all()[0])
             
             food_json_container.append({
                 "name": food.name,
                 "slug": food.slug,
                 "price": food.price,
-                "category": food.category,
-                "images": all_images_container
+                "image": image
             })
         
         return Response(food_json_container)
     
     
-class Edit_Dish(APIView):
+class Dish_Details(APIView):
     def get(self, request, *args, **kwargs):
         slug = self.kwargs['slug']
         
@@ -149,7 +145,7 @@ class Edit_Dish(APIView):
                 'status': 'not found'
             })
             
-    def post(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         slug = self.kwargs['slug']
         
         food = Food.objects.get(slug=slug)
