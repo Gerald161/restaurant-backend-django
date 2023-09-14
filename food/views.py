@@ -1,6 +1,6 @@
 from django.http import JsonResponse, HttpResponse
 from .models import Food, Added_Image
-import re
+import re, json
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -24,8 +24,6 @@ class Upload(APIView):
         food.slug = f"{food.slug}-{food.id}"
 
         food.save()
-        
-        print(request.FILES)
         
         for image in request.FILES.values():
             added_image = Added_Image()
@@ -152,6 +150,33 @@ class Edit_Dish(APIView):
             })
             
     def post(self, request, *args, **kwargs):
+        slug = self.kwargs['slug']
+        
+        food = Food.objects.get(slug=slug)
+        
+        food.name = request.data.get("name")
+        
+        food.price = request.data.get("price")
+        
+        food.category = request.data.get("category")
+        
+        indicesToRemove = json.loads(request.data.get("image_index_to_remove"))
+        
+        if len(indicesToRemove) > 0:
+            for index in indicesToRemove:
+                food.images.all()[index].delete()
+        
+        for image in request.FILES.values():
+            added_image = Added_Image()
+            
+            added_image.image = image
+            
+            added_image.save()
+            
+            food.images.add(added_image)
+        
+        food.save()
+        
         return Response({
-            'status': 'final update save stuff'
+            'status': 'updated'
         })
