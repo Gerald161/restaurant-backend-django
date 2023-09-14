@@ -5,4 +5,4 @@
 *.pyc
 *.pyo
 __pycache__/
-**/media/
+media/
