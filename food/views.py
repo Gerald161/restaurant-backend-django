@@ -64,38 +64,26 @@ class Search(APIView):
         slug = self.kwargs['slug']
         
         food_json_container = []
-            
-        all_images_container = []
         
-        if request.POST.get('search') is not None:
-            search_term = request.POST.get('search').lower()
-            
-            all_foods = Food.objects.filter(name__istartswith=search_term)[:8]
-            
-            for food in all_foods:    
-                food_json_container.append({
-                    "name": food.name,
-                })
-            
-            return Response(food_json_container)
-        else:
-            search_term = slug.replace("-", " ")
+        search_term = slug.replace("-", " ")
+    
+        all_foods = Food.objects.filter(name__istartswith=search_term)[:8]
         
-            all_foods = Food.objects.filter(name__istartswith=search_term)[:8]
+        for food in all_foods:
+            all_images_container = []
             
-            for food in all_foods:
-                for image in food.images.all():
-                    all_images_container.append(str(image))
-                
-                food_json_container.append({
-                    "name": food.name,
-                    "slug": food.slug,
-                    "price": food.price,
-                    "category": food.category,
-                    "images": all_images_container
-                })
+            for image in food.images.all():
+                all_images_container.append(str(image))
             
-            return Response(food_json_container)
+            food_json_container.append({
+                "name": food.name,
+                "slug": food.slug,
+                "price": food.price,
+                "category": food.category,
+                "images": all_images_container
+            })
+        
+        return Response(food_json_container)
     
 
 class Category(APIView):
