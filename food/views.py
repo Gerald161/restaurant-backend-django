@@ -1,5 +1,5 @@
 from django.http import JsonResponse, HttpResponse
-from .models import Food, Added_Image
+from .models import Food, Added_Image, FoodOrder
 import re, json
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -90,9 +90,7 @@ class Category(APIView):
     def get(self, request, *args, **kwargs):
         slug = self.kwargs['slug']
         
-        category = slug.replace("-", " ")
-        
-        all_foods = Food.objects.filter(category__iexact=category)[:12]
+        all_foods = Food.objects.filter(category__iexact=slug)[:12]
         
         food_json_container = []
         
@@ -107,6 +105,67 @@ class Category(APIView):
             })
         
         return Response(food_json_container)
+    
+
+class Order(APIView):
+    def get(self, request, *args, **kwargs):
+        all_orders = FoodOrder.objects.filter(user=request.user)
+        
+        order_container = []
+        
+        for order in all_orders:
+            order_container.append({
+                "name": order.food.name,
+                "slug": order.food.slug,
+                "price": order.food.price,
+                "image": str(order.food.images.all()[0]),
+                "amount": order.amount
+            })
+        
+        return Response(order_container)
+    
+    def post(self, request, *args, **kwargs):
+        slug = self.kwargs['slug']
+        
+        order = FoodOrder()
+        
+        food = Food.objects.filter(slug=slug).first()
+        
+        if food is None:
+            order.food = food
+            
+            order.user = request.user
+            
+            order.amount = request.data.get("amount")
+            
+            order.save()
+            
+            return Response({
+                'status': 'uploaded'
+            })
+        else:
+            return Response({
+                'status': 'added'
+            })
+            
+            
+    def delete(self, request, *args, **kwargs):
+        slug = self.kwargs['slug']
+        
+        food = Food.objects.get(slug=slug)
+        
+        order = FoodOrder.objects.filter(food=food).first()
+        
+        if order is not None:
+            order.delete()
+            
+            return Response({
+                'status': 'deleted'
+            })
+        else:
+            return Response({
+                'status': 'no such order'
+            })
     
     
 class Dish_Details(APIView):
