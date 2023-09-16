@@ -41,9 +41,10 @@ CORS_ALLOWED_ORIGINS = [
 
 # Allow specific headers and methods
 CORS_ALLOW_HEADERS = [
-    "token",  # Add any custom headers you are using
+    "Token",  # Add any custom headers you are using
     "Content-Type",
     "Accept",
+    "Authorization"
 ]
 
 CORS_ALLOW_METHODS = [

@@ -131,7 +131,7 @@ class Order(APIView):
         
         food = Food.objects.filter(slug=slug).first()
         
-        if food is None:
+        if food is not None:
             order.food = food
             
             order.user = request.user
@@ -144,8 +144,10 @@ class Order(APIView):
                 'status': 'uploaded'
             })
         else:
+            # has already been added 
+            
             return Response({
-                'status': 'added'
+                'status': 'problem here'
             })
             
             
@@ -163,8 +165,32 @@ class Order(APIView):
                 'status': 'deleted'
             })
         else:
+            # no such order
+            
             return Response({
-                'status': 'no such order'
+                'status': 'problem here'
+            })
+            
+    def put(self, request, *args, **kwargs):
+        slug = self.kwargs['slug']
+        
+        food = Food.objects.get(slug=slug)
+        
+        order = FoodOrder.objects.filter(food=food).first()
+        
+        if order is not None:
+            order.amount = int(request.data.get("amount"))
+            
+            order.save()
+            
+            return Response({
+                'status': 'updated'
+            })
+        else:
+            # no such order
+            
+            return Response({
+                'status': 'problem here'
             })
     
     
