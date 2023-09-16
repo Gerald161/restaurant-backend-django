@@ -6,4 +6,3 @@
 *.pyo
 __pycache__/
 media/*
-db.sqlite3
