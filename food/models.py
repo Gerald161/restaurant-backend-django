@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from io import BytesIO
 from PIL import Image
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -81,3 +82,13 @@ class Food(models.Model):
             image.delete()
         
         super().delete(*args, **kwargs)
+        
+        
+class FoodOrder(models.Model):
+    amount = models.IntegerField(default=1)
+    food = models.ForeignKey(Food, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    time_added = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.food.name
