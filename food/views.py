@@ -131,7 +131,7 @@ class Order(APIView):
         
         food = Food.objects.filter(slug=slug).first()
         
-        if food is not None:
+        if FoodOrder.objects.filter(food=food).filter(user=request.user).first() is None:
             order.food = food
             
             order.user = request.user
