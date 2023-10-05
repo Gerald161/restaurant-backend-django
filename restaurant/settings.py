@@ -32,8 +32,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["192.168.39.88", "localhost", "127.0.0.1"]
 
-# CORS_ORIGIN_ALLOW_ALL = True
-
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     # Add more origins as needed
@@ -71,6 +69,7 @@ INSTALLED_APPS = [
     "account",
     "food",
     'corsheaders',
+    "adrf"
 ]
 
 ASGI_APPLICATION = 'restaurant.asgi.application'
