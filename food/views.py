@@ -1,8 +1,10 @@
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from .models import Food, Added_Image, FoodOrder
 import re, json
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from adrf.views import APIView as ASYNCAPIVIEW
+from asgiref.sync import async_to_sync, sync_to_async
 
 # Create your views here.
 class Upload(APIView):
@@ -249,3 +251,40 @@ class Dish_Details(APIView):
         return Response({
             'status': 'updated'
         })
+     
+     
+import openai
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+
+class askAIQuestion(ASYNCAPIVIEW):
+    async def post(self, request, *args, **kwargs):
+        response = await ask_question(request)
+        
+        return Response({
+            'response': response
+        })
+        
+        
+@sync_to_async
+def ask_question(request):
+    openai.api_key = os.getenv('OPEN_AI_KEY')
+    
+    # print(json.loads(request.data.get("question")))
+    
+    # assistant_response = "yo"
+    
+    chat_log = json.loads(request.data.get("question"))
+    
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=chat_log
+    )
+    
+    assistant_response = response["choices"][0]["message"]["content"]
+    
+    chat_log.append({"role": "assistant", "content": assistant_response})
+    
+    return assistant_response
