@@ -14,3 +14,4 @@ python manage.py createsuperuser
 pip install python-dotenv
 pip install openai
 pip install adrf
+pip install --upgrade openai
