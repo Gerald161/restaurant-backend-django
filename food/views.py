@@ -253,38 +253,22 @@ class Dish_Details(APIView):
         })
      
      
-import openai
-import os
-from dotenv import load_dotenv
-load_dotenv()
-
+from openai import AsyncOpenAI
 
 class askAIQuestion(ASYNCAPIVIEW):
     async def post(self, request, *args, **kwargs):
-        response = await ask_question(request)
+        # chat_log = [{"role": "user", "content": "How are you doing?"}]
+
+        chat_log = json.loads(request.data.get("question"))
+
+        client = AsyncOpenAI(
+            api_key="",  
+        )
+        
+        completion = await client.chat.completions.create(model="gpt-4o-mini", messages=chat_log)
+
+        response = completion.choices[0].message.content
         
         return Response({
             'response': response
         })
-        
-        
-@sync_to_async
-def ask_question(request):
-    openai.api_key = os.getenv('OPEN_AI_KEY')
-    
-    # print(json.loads(request.data.get("question")))
-    
-    # assistant_response = "yo"
-    
-    chat_log = json.loads(request.data.get("question"))
-    
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=chat_log
-    )
-    
-    assistant_response = response["choices"][0]["message"]["content"]
-    
-    chat_log.append({"role": "assistant", "content": assistant_response})
-    
-    return assistant_response
