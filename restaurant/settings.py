@@ -32,6 +32,7 @@ ALLOWED_HOSTS = [".vercel.app", "*"]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "https://real-estate-site-zeta-eosin.vercel.app"
     # Add more origins as needed
 ]
 
