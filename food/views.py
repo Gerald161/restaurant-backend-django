@@ -1,10 +1,8 @@
-from django.http import JsonResponse
 from .models import Food, Added_Image, FoodOrder
 import re, json
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from adrf.views import APIView as ASYNCAPIVIEW
-from asgiref.sync import async_to_sync, sync_to_async
 
 # Create your views here.
 class Upload(APIView):
@@ -276,4 +274,4 @@ class askAIQuestion(ASYNCAPIVIEW):
         
         return Response({
             'response': response
-        }),  
+        }) 
