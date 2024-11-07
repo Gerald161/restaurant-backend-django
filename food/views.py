@@ -254,7 +254,6 @@ class Dish_Details(APIView):
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
 import os
-from decouple import config
 
 load_dotenv()
 
@@ -266,7 +265,7 @@ class askAIQuestion(ASYNCAPIVIEW):
         chat_log = json.loads(request.data.get("question"))
 
         client = AsyncOpenAI(
-            api_key=config("OPENAIKEY"),  
+            api_key=os.environ["OPENAIKEY"],  
         )
         
         completion = await client.chat.completions.create(model="gpt-4o-mini", messages=chat_log)
@@ -280,5 +279,4 @@ class askAIQuestion(ASYNCAPIVIEW):
     async def get(self, request, *args, **kwargs):
         return Response({
             'response': "works",
-            "key": config("OPENAIKEY")
         }) 
