@@ -254,6 +254,11 @@ class Dish_Details(APIView):
      
      
 from openai import AsyncOpenAI
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 
 class askAIQuestion(ASYNCAPIVIEW):
     async def post(self, request, *args, **kwargs):
@@ -262,7 +267,7 @@ class askAIQuestion(ASYNCAPIVIEW):
         chat_log = json.loads(request.data.get("question"))
 
         client = AsyncOpenAI(
-            api_key="",  
+            api_key=os.environ["OPENAIKEY"],  
         )
         
         completion = await client.chat.completions.create(model="gpt-4o-mini", messages=chat_log)
@@ -271,4 +276,4 @@ class askAIQuestion(ASYNCAPIVIEW):
         
         return Response({
             'response': response
-        })
+        }),  
