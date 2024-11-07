@@ -266,7 +266,7 @@ class askAIQuestion(ASYNCAPIVIEW):
         chat_log = json.loads(request.data.get("question"))
 
         client = AsyncOpenAI(
-            api_key=os.getenv("OPENAIKEY") if "OPENAIKEY" in os.environ["OPENAIKEY"] else config("OPENAIKEY"),  
+            api_key=config("OPENAIKEY"),  
         )
         
         completion = await client.chat.completions.create(model="gpt-4o-mini", messages=chat_log)
@@ -280,5 +280,5 @@ class askAIQuestion(ASYNCAPIVIEW):
     async def get(self, request, *args, **kwargs):
         return Response({
             'response': "works",
-            "key": os.getenv("OPENAIKEY") if "OPENAIKEY" in os.environ["OPENAIKEY"] else config("OPENAIKEY")
+            "key": config("OPENAIKEY")
         }) 
