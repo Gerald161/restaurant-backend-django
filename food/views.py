@@ -260,9 +260,9 @@ load_dotenv()
 
 class askAIQuestion(ASYNCAPIVIEW):
     async def post(self, request, *args, **kwargs):
-        chat_log = [{"role": "user", "content": "How are you doing?"}]
+        # chat_log = [{"role": "user", "content": "How are you doing?"}]
 
-        # chat_log = json.loads(request.data.get("question"))
+        chat_log = json.loads(request.data.get("question"))
 
         client = AsyncOpenAI(
             api_key=os.environ["OPENAIKEY"],  
@@ -274,4 +274,9 @@ class askAIQuestion(ASYNCAPIVIEW):
         
         return Response({
             'response': response
+        }) 
+    
+    async def get(self, request, *args, **kwargs):
+        return Response({
+            'response': "works"
         }) 
