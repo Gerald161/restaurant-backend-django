@@ -259,13 +259,15 @@ load_dotenv()
 
 
 class askAIQuestion(ASYNCAPIVIEW):
-    async def post(self, request, *args, **kwargs):
+    async def get(self, request, *args, **kwargs):
         # chat_log = [{"role": "user", "content": "How are you doing?"}]
 
-        chat_log = json.loads(request.data.get("question"))
+        # chat_log = json.loads(request.data.get("question"))
+
+        chat_log = json.loads(request.query_params.get("question"))
 
         client = AsyncOpenAI(
-            api_key=os.environ["OPENAIKEY"],  
+            api_key=os.environ["OPENAIKEY"],    
         )
         
         completion = await client.chat.completions.create(model="gpt-4o-mini", messages=chat_log)
@@ -274,9 +276,4 @@ class askAIQuestion(ASYNCAPIVIEW):
         
         return Response({
             'response': response
-        }) 
-    
-    async def get(self, request, *args, **kwargs):
-        return Response({
-            'response': "works",
-        }) 
+        })
