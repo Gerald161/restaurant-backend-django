@@ -278,5 +278,6 @@ class askAIQuestion(ASYNCAPIVIEW):
     
     async def get(self, request, *args, **kwargs):
         return Response({
-            'response': "works"
+            'response': "works",
+            "key": os.environ["OPENAIKEY"]
         }) 
